@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "claude-font-fix",
+  "version": "1.0",
+  "description": "Fix Claude.ai Chinese font rendering by replacing Yu Gothic with Noto Serif SC",
+  "content_scripts": [
+    {
+      "matches": ["https://claude.ai/*", "https://a.claude.ai/*"],
+      "css": ["style.css"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ]
+}

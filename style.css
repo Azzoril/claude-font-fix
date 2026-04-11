@@ -1,0 +1,12 @@
+/* Hijack Yu Gothic (Japanese font) and replace with Noto Serif SC (Chinese serif font) */
+/* 劫持 Yu Gothic（日文字体），替换为 Noto Serif SC（原Claude思源宋体） */
+@font-face {
+  font-family: "Yu Gothic";
+  src: local("Noto Serif SC");
+  font-weight: 1 999;
+}
+@font-face {
+  font-family: "Yu Gothic UI";
+  src: local("Noto Serif SC");
+  font-weight: 1 999;
+}
