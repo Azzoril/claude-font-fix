@@ -1,6 +1,7 @@
 ```text
 body.font-ui
 `- #root
+   |- div[data-is-streaming]                   <- "true" during streaming, "false" when done
    |- .font-claude-response                    <- outermost wrapper for each reply
    |  `- div > div.grid.grid-rows-[auto_auto]
    |     |
