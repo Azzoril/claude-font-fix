@@ -14,18 +14,18 @@
 
 /* Incognito chat uses hardcoded font-family instead of CSS variables.
  * Structure:
- *   .font-claude-response -> grid -> .row-start-1 (thinking, don't touch)
- *   .font-claude-response -> grid -> .row-start-2 (response body, needs fix)
+ *   [data-is-streaming] -> .font-claude-response -> grid -> .row-start-1 (thinking)
+ *   [data-is-streaming] -> .font-claude-response -> grid -> .row-start-2 (response)
  *   .font-claude-response.standard-markdown (artifact MD preview, same element)
  *
- * Two types of children need overriding:
- *   .standard-markdown
- *   .font-claude-response-body */
+ * [data-is-streaming="false"] prevents font override during thinking streaming,
+ * where all content is temporarily in row-start-2 before DOM restructures.
+ * Once streaming completes and DOM splits into row-start-1/2, the fix activates. */
 
-/* Response body: container (for list/heading inheritance) */
-.font-claude-response .row-start-2 .standard-markdown,
+/* Response body: .standard-markdown container (for ol/ul/h1-h6 inheritance) */
+[data-is-streaming="false"] .font-claude-response .row-start-2 .standard-markdown,
 /* Response body: <p> (has own font-family declaration) */
-.font-claude-response .row-start-2 .font-claude-response-body,
+[data-is-streaming="false"] .font-claude-response .row-start-2 .font-claude-response-body,
 /* Artifact MD preview: container (both classes on same element) */
 .font-claude-response.standard-markdown,
 /* Artifact MD preview: <p> inside */

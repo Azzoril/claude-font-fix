@@ -50,15 +50,13 @@ We hijack the Japanese font-face `Yu Gothic` declarations to point to proper Chi
 `@font-face` hijacking doesn't work for Hiragino Sans on macOS (Chrome restricts overriding system-level fonts). Instead we insert Chinese fonts before Hiragino Sans via four layers:
  
 1. **`:root` variable override**: covers normal (non-incognito) chat
-2. **`.row-start-2` scoped selectors**: covers incognito chat (which hardcodes `font-family`), scoped to response body to avoid polluting the thinking block in `.row-start-1`
+2. **`[data-is-streaming="false"]` + `.row-start-2` scoped selectors**: covers incognito chat (which hardcodes `font-family`). `data-is-streaming` prevents font override during thinking stream (where content is temporarily unsplit); `.row-start-2` scopes to response body after DOM restructures, avoiding the thinking block in `.row-start-1`
 3. **Compound selectors**: covers the Artifact/MD preview panel where `.font-claude-response` and `.standard-markdown` sit on the same element
 4. **`.katex .cjk_fallback`**: covers CJK characters inside math formulas
  
 The Chinese font fallback order is: **Noto Serif CJK SC** (optional, install for best results) -> **Songti SC** (macOS built-in serif) -> **PingFang SC** (fallback sans-serif). English and numbers hit `Anthropic Serif` first and are unaffected.
  
 For the full DOM structure and selector coverage matrix, see [dom-structure.md](dom-structure.md).
- 
-**Known limitation:** During streaming of thinking blocks, content may briefly flash with serif font due to DOM not yet being split into `row-start-1` / `row-start-2`. It reverts automatically once streaming completes.
 
 ## Installation
 
