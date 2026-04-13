@@ -1,5 +1,22 @@
-@font-face {
-  font-family: "Hiragino Sans";
-  src: local("PingFang SC"); /* or Songti SC */
-  font-weight: 1 999;
+:root {
+  /* Noto Serif CJK SC (optional, install for best results) -> Songti SC (macOS built-in serif) -> PingFang SC (fallback sans-serif) */
+  --font-ui-serif: "Anthropic Serif", Georgia, "Arial Hebrew", "Noto Sans Hebrew",
+    "Times New Roman", Times, "Noto Serif CJK SC", "Songti SC", "PingFang SC", "Hiragino Sans", "Yu Gothic", Meiryo,
+    "Noto Sans CJK JP", "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC",
+    "Microsoft YaHei", "Noto Sans CJK SC", "Apple SD Gothic Neo", "Malgun Gothic",
+    "Noto Sans CJK KR", serif !important;
+  --font-serif: "Anthropic Serif", Georgia, "Arial Hebrew", "Noto Sans Hebrew",
+    "Times New Roman", Times, "Noto Serif CJK SC", "Songti SC", "PingFang SC", "Hiragino Sans", "Yu Gothic", Meiryo,
+    "Noto Sans CJK JP", "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC",
+    "Microsoft YaHei", "Noto Sans CJK SC", "Apple SD Gothic Neo", "Malgun Gothic",
+    "Noto Sans CJK KR", serif !important;
+}
+
+/* Incognito chat uses hardcoded font-family instead of CSS variables */
+.font-claude-response-body {
+  font-family: "Anthropic Serif", Georgia, "Arial Hebrew", "Noto Sans Hebrew",
+    "Times New Roman", Times, "Noto Serif CJK SC", "Songti SC", "PingFang SC", "Hiragino Sans", "Yu Gothic", Meiryo,
+    "Noto Sans CJK JP", "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC",
+    "Microsoft YaHei", "Noto Sans CJK SC", "Apple SD Gothic Neo", "Malgun Gothic",
+    "Noto Sans CJK KR", serif !important;
 }
