@@ -23,7 +23,7 @@ Windows and Mac share the same chain, but hit different Japanese fonts depending
 
 **Mac:** Hiragino Sans (7th) is matched. PingFang SC (14th) never gets reached.
 
-Both result in Chinese text being rendered with Japanese glyph standards, incorrect stroke structures and poor readability for Chinese users.
+Both result in Chinese text being rendered with Japanese glyph standards, causing incorrect stroke structures and poor readability for Chinese users.
 
 
 ## Solution
@@ -44,15 +44,21 @@ We hijack the Japanese font-face `Yu Gothic` declarations to point to proper Chi
   font-weight: 1 999;
 }
 ```
-
-
-### Mac: CSS variable override
-
-`@font-face` hijacking doesn't work for Hiragino Sans on macOS (Chrome restricts overriding system-level fonts). Instead, we override the `--font-ui-serif` and `--font-serif` CSS variables, inserting Chinese fonts before Hiragino Sans in the fallback chain.
  
-The fallback order for Chinese text is: **Noto Serif CJK SC** (optional, needs to be installed) -> **Songti SC** (macOS built-in serif) -> **PingFang SC** (fallback sans-serif).
-
-English and numbers hit `Anthropic Serif` first and are completely unaffected in both cases.
+### Mac: CSS variable override + selector override
+ 
+`@font-face` hijacking doesn't work for Hiragino Sans on macOS (Chrome restricts overriding system-level fonts). Instead we insert Chinese fonts before Hiragino Sans via four layers:
+ 
+1. **`:root` variable override**: covers normal (non-incognito) chat
+2. **`.row-start-2` scoped selectors**: covers incognito chat (which hardcodes `font-family`), scoped to response body to avoid polluting the thinking block in `.row-start-1`
+3. **Compound selectors**: covers the Artifact/MD preview panel where `.font-claude-response` and `.standard-markdown` sit on the same element
+4. **`.katex .cjk_fallback`**: covers CJK characters inside math formulas
+ 
+The Chinese font fallback order is: **Noto Serif CJK SC** (optional, install for best results) -> **Songti SC** (macOS built-in serif) -> **PingFang SC** (fallback sans-serif). English and numbers hit `Anthropic Serif` first and are unaffected.
+ 
+For the full DOM structure and selector coverage matrix, see [dom-structure.md](dom-structure.md).
+ 
+**Known limitation:** During streaming of thinking blocks, content may briefly flash with serif font due to DOM not yet being split into `row-start-1` / `row-start-2`. It reverts automatically once streaming completes.
 
 ## Installation
 

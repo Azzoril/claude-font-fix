@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "claude-font-fix for Mac",
   "version": "1.0",
-  "description": "Fix Claude.ai Chinese font rendering by replacing Yu Gothic with Noto Serif SC",
+  "description": "Fix Claude.ai Chinese font rendering on macOS by inserting Chinese fonts before Hiragino Sans",
   "content_scripts": [
     {
       "matches": ["https://claude.ai/*", "https://a.claude.ai/*"],

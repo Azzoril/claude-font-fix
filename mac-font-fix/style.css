@@ -12,11 +12,32 @@
     "Noto Sans CJK KR", serif !important;
 }
 
-/* Incognito chat uses hardcoded font-family instead of CSS variables */
-.font-claude-response-body {
+/* Incognito chat uses hardcoded font-family instead of CSS variables.
+ * Structure:
+ *   .font-claude-response -> grid -> .row-start-1 (thinking, don't touch)
+ *   .font-claude-response -> grid -> .row-start-2 (response body, needs fix)
+ *   .font-claude-response.standard-markdown (artifact MD preview, same element)
+ *
+ * Two types of children need overriding:
+ *   .standard-markdown
+ *   .font-claude-response-body */
+
+/* Response body: container (for list/heading inheritance) */
+.font-claude-response .row-start-2 .standard-markdown,
+/* Response body: <p> (has own font-family declaration) */
+.font-claude-response .row-start-2 .font-claude-response-body,
+/* Artifact MD preview: container (both classes on same element) */
+.font-claude-response.standard-markdown,
+/* Artifact MD preview: <p> inside */
+.font-claude-response.standard-markdown .font-claude-response-body {
   font-family: "Anthropic Serif", Georgia, "Arial Hebrew", "Noto Sans Hebrew",
     "Times New Roman", Times, "Noto Serif CJK SC", "Songti SC", "PingFang SC", "Hiragino Sans", "Yu Gothic", Meiryo,
     "Noto Sans CJK JP", "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC",
     "Microsoft YaHei", "Noto Sans CJK SC", "Apple SD Gothic Neo", "Malgun Gothic",
     "Noto Sans CJK KR", serif !important;
+}
+
+/* KaTeX renders CJK characters with .cjk_fallback - override to use Chinese fonts */
+.katex .cjk_fallback {
+  font-family: "Noto Serif CJK SC", "Songti SC", "PingFang SC", sans-serif !important;
 }
