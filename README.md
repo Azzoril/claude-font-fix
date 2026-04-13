@@ -1,36 +1,33 @@
 # claude-font-fix
 
-Fix Claude.ai Chinese font rendering on Windows by replacing Yu Gothic (Japanese font) with Noto Serif SC using @font-face hijacking.
+Fix Claude.ai Chinese font rendering by replacing Japanese fonts with Chinese fonts using `@font-face` hijacking.
 
 ## Problem
 
-Claude.ai recently updated their frontend fonts. On Windows, Chinese characters are now rendered using **Yu Gothic** (Japanese font). This happens because Claude's CSS font fallback chain places Japanese fonts before Chinese fonts:
-Anthropic Serif Web Text -> Georgia -> ... -> Yu Gothic (8th) -> ... -> Microsoft YaHei (15th)
+Claude.ai recently updated their frontend CSS font fallback chain. Chinese characters are now rendered using Japanese fonts instead of proper Chinese fonts.
 
-The browser matches Chinese characters from left to right. Yu Gothic contains Chinese characters but renders them using Japanese glyph standards, resulting in incorrect stroke structures and poor readability for Chinese users.
+Claude's own font (`Anthropic Serif`) only covers English and symbols. For Chinese characters, the browser walks down the fallback chain and picks the first font that can render them. The full chain is:
+
+`"Anthropic Serif", Georgia, "Arial Hebrew", "Noto Sans Hebrew", "Times New Roman", Times, "Hiragino Sans", "Yu Gothic", Meiryo, "Noto Sans CJK JP", "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans CJK KR", serif`
+
+Windows and Mac share the same chain, but hit different Japanese fonts depending on which are installed:
+
+**Windows:** Yu Gothic (8th) is matched. PingFang SC is not installed, Microsoft YaHei (15th) never gets reached.
+
+**Mac:** Hiragino Sans (7th) is matched. PingFang SC (14th) never gets reached.
+
+Both result in Chinese text being rendered with Japanese glyph standards, incorrect stroke structures and poor readability for Chinese users.
+
 
 ## Solution
 
-Instead of fighting CSS specificity and selectors, we hijack the `Yu Gothic` font-face declaration to point to `Noto Serif SC`:
-
-```css
-@font-face {
-  font-family: "Yu Gothic";
-  src: local("Noto Serif SC");
-  font-weight: 1 999;
-}
-@font-face {
-  font-family: "Yu Gothic UI";
-  src: local("Noto Serif SC");
-  font-weight: 1 999;
-}
-```
-
-The browser thinks it's using Yu Gothic, but actually loads Noto Serif SC. English/numbers hit `Anthropic Serif Web Text` first and are completely unaffected.
+Instead of fighting CSS specificity and selectors, we hijack the Japanese font-face declarations to point to proper Chinese fonts. English/numbers hit `Anthropic Serif` first and are completely unaffected.
 
 ## Installation
 
-### 1. Install Noto Serif SC font
+### Windows
+
+#### 1. Install Noto Serif SC font
 
 If you already have **Noto Serif SC** or **Source Han Serif SC** (思源宋体) installed, skip this step. They are the same typeface.
 
@@ -38,18 +35,32 @@ Download from [GitHub Releases](https://github.com/notofonts/noto-cjk/releases) 
 
 Install the font and restart Chrome.
 
-### 2. Install the Chrome extension
+#### 2. Install the Chrome extension
 
 ```bash
 git clone https://github.com/Azzoril/claude-font-fix.git
 ```
-or copy `manifest.json` and `style.css` into a folder.
+or copy `windows-font-fix/manifest.json` and `windows-font-fix/style.css` into a folder.
 
 1. Open `chrome://extensions`
 2. Enable **Developer mode** (top right)
-3. Click **Load unpacked**
-4. Select the cloned folder
-5. Refresh Claude.ai
+3. Click **Load unpacked** -> select the `windows-font-fix` folder
+4. Refresh Claude.ai
+
+### Mac
+#### Install the Chrome extension
+```bash
+git clone https://github.com/Azzoril/claude-font-fix.git
+```
+or copy `mac-font-fix/manifest.json` and `mac-font-fix/style.css` into a folder.
+1. Open `chrome://extensions`
+2. Enable **Developer mode** (top right)
+3. Click **Load unpacked** -> select the `mac-font-fix` folder
+4. Refresh Claude.ai
+
+## Community
+ 
+Published on [LINUX DO](https://linux.do) community.
 
 ## License
 
