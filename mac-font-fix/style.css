@@ -13,28 +13,44 @@
 }
 
 /* Incognito chat uses hardcoded font-family instead of CSS variables.
- * Structure:
- *   [data-is-streaming] -> .font-claude-response -> grid -> .row-start-1 (thinking)
- *   [data-is-streaming] -> .font-claude-response -> grid -> .row-start-2 (response)
- *   .font-claude-response.standard-markdown (artifact MD preview, same element)
  *
- * [data-is-streaming="false"] prevents font override during thinking streaming,
- * where all content is temporarily in row-start-2 before DOM restructures.
- * Once streaming completes and DOM splits into row-start-1/2, the fix activates. */
+ * DOM layout evolved over time. Current structure (as of 2026-04):
+ *   .font-claude-response
+ *   |- [with thinking]    div.grid.grid-rows-[auto_auto]
+ *   |                     |- .row-start-1 ... .font-ui.leading-normal ... .standard-markdown  (thinking)
+ *   |                     |- .row-start-2 ... .standard-markdown                              (response)
+ *   |- [no thinking]      div > :is(.standard-markdown, .progressive-markdown)                (response)
+ *
+ * Streaming uses .progressive-markdown (each block wrapped individually),
+ * completed state uses .standard-markdown. Both must be matched.
+ *
+ * While thinking is streaming, the thinking markdown is temporarily rendered
+ * inside .row-start-2 before DOM restructures, so we can't rely on position-
+ * based selectors alone to isolate it. The reliable anchor is the wrapping
+ * div.font-ui.leading-normal (used by Anthropic for thinking content in both
+ * streaming and completed states). */
 
-/* Response body: .standard-markdown container (for ol/ul/h1-h6 inheritance) */
-[data-is-streaming="false"] .font-claude-response .row-start-2 .standard-markdown,
-/* Response body: <p> (has own font-family declaration) */
-[data-is-streaming="false"] .font-claude-response .row-start-2 .font-claude-response-body,
-/* Artifact MD preview: container (both classes on same element) */
-.font-claude-response.standard-markdown,
-/* Artifact MD preview: <p> inside */
-.font-claude-response.standard-markdown .font-claude-response-body {
+/* Main response body: match both .standard-markdown and .progressive-markdown,
+ * use descendant selectors so nesting depth doesn't matter */
+[data-is-streaming] .font-claude-response :is(.standard-markdown, .progressive-markdown),
+[data-is-streaming] .font-claude-response :is(.standard-markdown, .progressive-markdown) .font-claude-response-body,
+/* Artifact MD preview (both classes on same element) */
+.font-claude-response:is(.standard-markdown, .progressive-markdown),
+.font-claude-response:is(.standard-markdown, .progressive-markdown) .font-claude-response-body {
   font-family: "Anthropic Serif", Georgia, "Arial Hebrew", "Noto Sans Hebrew",
     "Times New Roman", Times, "Noto Serif CJK SC", "Songti SC", "PingFang SC", "Hiragino Sans", "Yu Gothic", Meiryo,
     "Noto Sans CJK JP", "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC",
     "Microsoft YaHei", "Noto Sans CJK SC", "Apple SD Gothic Neo", "Malgun Gothic",
     "Noto Sans CJK KR", serif !important;
+}
+
+/* Guard: thinking content keeps UI sans-serif font.
+ * Anchors on .font-ui.leading-normal which wraps thinking content in both
+ * streaming (inside .row-start-2) and completed (inside .row-start-1) states,
+ * so one rule handles both. */
+.font-claude-response .font-ui.leading-normal :is(.standard-markdown, .progressive-markdown),
+.font-claude-response .font-ui.leading-normal .font-claude-response-body {
+  font-family: inherit !important;
 }
 
 /* KaTeX renders CJK characters with .cjk_fallback - override to use Chinese fonts */
