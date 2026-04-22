@@ -47,17 +47,17 @@ We hijack the Japanese font-face `Yu Gothic` declarations to point to proper Chi
 
 ### Mac: CSS variable override + selector override
 
-`@font-face` hijacking doesn't work for Hiragino Sans on macOS (Chrome restricts overriding system-level fonts). Instead we insert Chinese fonts before Hiragino Sans via four layers:
+`@font-face` hijacking doesn't work for Hiragino Sans on macOS (Chrome restricts overriding system fonts). Instead we insert Chinese fonts before Hiragino Sans:
 
-1. **`:root` variable override**: covers normal (non-incognito) chat where `--font-ui-serif` and `--font-serif` are used
-2. **`.font-claude-response` scoped selectors matching `:is(.standard-markdown, .progressive-markdown)`**: covers incognito chat (which hardcodes `font-family` instead of using CSS variables). The selector is depth-agnostic so it handles all four DOM variants: streaming/completed | with-thinking/no-thinking. The two markdown classes correspond to streaming (`.progressive-markdown`) and completed (`.standard-markdown`) rendering.
-3. **`.font-ui.leading-normal` guard**: scopes back to UI sans-serif for thinking content. This anchor works in both streaming and completed states because Anthropic uses the same wrapper class for thinking content in both cases — position-based selectors like `.row-start-1` don't work because thinking markdown is temporarily rendered inside `.row-start-2` during streaming before the DOM restructures.
-4. **Compound `.font-claude-response.standard-markdown`**: covers the Artifact/MD preview panel where both classes sit on the same element.
-5. **`.katex .cjk_fallback`**: covers CJK characters inside math formulas.
+1. **`:root` variables**: covers normal chat where `--font-ui-serif` / `--font-serif` are used.
+2. **Selectors on `.font-claude-response`**: covers incognito chat, which hardcodes `font-family` instead of reading variables. Matches `:is(.standard-markdown, .progressive-markdown)` to handle both streaming and completed rendering, with no depth constraints so it works whether or not the reply has a thinking block.
+3. **`.font-ui.leading-normal` guard**: restores UI sans-serif for thinking content. Anthropic uses this wrapper class in both streaming and completed states, so one rule covers both. Position-based selectors like `.row-start-1` won't work because thinking content moves positions during streaming.
+4. **`.font-claude-response.standard-markdown`**: covers the Artifact/MD preview where both classes sit on the same element.
+5. **`.katex .cjk_fallback`**: covers CJK inside math formulas.
 
-The Chinese font fallback order is: **Noto Serif CJK SC** (optional, install for best results) -> **Songti SC** (macOS built-in serif) -> **PingFang SC** (fallback sans-serif). English and numbers hit `Anthropic Serif` first and are unaffected.
+Chinese font order: **Noto Serif CJK SC** (optional), **Songti SC** (macOS built-in), **PingFang SC** (fallback). English and numbers hit `Anthropic Serif` first and are unaffected.
 
-For the full DOM structure and selector coverage matrix, see [dom-structure.md](dom-structure.md).
+See [dom-structure.md](dom-structure.md) for the full DOM layout.
 
 ## Installation
 
